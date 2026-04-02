@@ -120,8 +120,7 @@ async def dashboard_page(request: Request):
         ) if scored else 0,
     }
 
-    return templates.TemplateResponse("dashboard.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "dashboard.html", {
         "page": "dashboard",
         "draft_count": len(drafts),
         "approved_count": len(approved),
@@ -139,8 +138,7 @@ async def generate_page(request: Request):
     subtopics = settings.get("content", {}).get("subtopics", [])
     post_types = list(POST_STRUCTURES.keys())
 
-    return templates.TemplateResponse("generate.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "generate.html", {
         "page": "generate",
         "subtopics": subtopics,
         "post_types": post_types,
@@ -150,8 +148,7 @@ async def generate_page(request: Request):
 @app.get("/review", response_class=HTMLResponse)
 async def review_page(request: Request):
     drafts = load_drafts()
-    return templates.TemplateResponse("review.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "review.html", {
         "page": "review",
         "drafts": drafts,
     })
@@ -172,8 +169,7 @@ async def review_detail_page(request: Request, draft_id: str):
         with open(briefing_file) as f:
             briefing = f.read()
 
-    return templates.TemplateResponse("review_detail.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "review_detail.html", {
         "page": "review",
         "draft": draft,
         "briefing": briefing,
@@ -184,8 +180,7 @@ async def review_detail_page(request: Request, draft_id: str):
 async def publish_page(request: Request):
     approved = load_approved()
     has_token = bool(os.getenv("LINKEDIN_ACCESS_TOKEN"))
-    return templates.TemplateResponse("publish.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "publish.html", {
         "page": "publish",
         "approved": approved,
         "has_token": has_token,
@@ -210,8 +205,7 @@ async def analytics_page(request: Request):
         "worst_post": min(scored, key=lambda p: p["score"]) if scored else None,
     }
 
-    return templates.TemplateResponse("analytics.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "analytics.html", {
         "page": "analytics",
         "posts": scored,
         "summary": summary,
@@ -230,8 +224,7 @@ async def learning_page(request: Request):
     insights = analyzer.analyze()
     gen_context = optimizer.get_generation_context()
 
-    return templates.TemplateResponse("learning.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "learning.html", {
         "page": "learning",
         "insights": insights,
         "gen_context": gen_context,
@@ -241,8 +234,7 @@ async def learning_page(request: Request):
 @app.get("/settings", response_class=HTMLResponse)
 async def settings_page(request: Request):
     settings, _ = load_config()
-    return templates.TemplateResponse("settings.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "settings.html", {
         "page": "settings",
         "settings": settings,
     })
