@@ -1,0 +1,35 @@
+{
+  "name": "commodity_quote_card",
+  "description": "Branded quote card for key insights",
+  "dimensions": {
+    "width": 1200,
+    "height": 628
+  },
+  "elements": {
+    "background": {
+      "type": "solid",
+      "color": "primary"
+    },
+    "accent_bars": [
+      {"position": "top", "height": 6, "color": "secondary"},
+      {"position": "bottom", "height": 6, "color": "secondary"}
+    ],
+    "quote_mark": {
+      "character": "\u201c",
+      "size": 120,
+      "color": "secondary",
+      "position": {"x": 60, "y": 40}
+    },
+    "quote_text": {
+      "max_chars_per_line": 40,
+      "font_size": 36,
+      "color": "#FFFFFF",
+      "position": {"x": 80, "y": 140}
+    },
+    "attribution": {
+      "font_size": 22,
+      "color": "secondary",
+      "position": {"x": 80, "y_from_bottom": 80}
+    }
+  }
+}

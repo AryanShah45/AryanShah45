@@ -1,0 +1,57 @@
+linkedin:
+  posting_days: [monday, wednesday, friday]
+  posting_time: "08:00"
+  timezone: "Asia/Kolkata"
+
+content:
+  topic: "Commodity Markets & Supply Chain"
+  subtopics:
+    - crude_oil_and_energy
+    - metals_and_mining
+    - agriculture_and_food
+    - shipping_and_logistics
+    - geopolitics_and_trade
+    - sustainability_and_esg
+  tone: "professional_human"
+  format: "paragraphs"
+  max_length: 1500
+  min_length: 800
+  hashtags_count: 4
+
+ai_engines:
+  primary_writer: "claude"
+  research:
+    - "perplexity"
+    - "grok"
+  analysis: "gemini"
+  enhancement: "openai"
+
+learning:
+  track_intervals_hours: [24, 48, 168]
+  min_posts_for_insights: 5
+  optimization_frequency: "weekly"
+  score_weights:
+    impressions: 0.3
+    reactions: 0.25
+    comments: 0.25
+    shares: 0.2
+
+visuals:
+  brand_colors:
+    primary: "#1B365D"
+    secondary: "#C5A572"
+    background: "#FFFFFF"
+    text: "#2D2D2D"
+  carousel_slides: 6
+  image_width: 1200
+  image_height: 628
+
+rss_feeds:
+  - name: "Reuters Commodities"
+    url: "https://www.reutersagency.com/feed/?best-topics=commodities"
+  - name: "S&P Global Commodity Insights"
+    url: "https://www.spglobal.com/commodityinsights/en/rss-feed"
+  - name: "Investing.com Commodities"
+    url: "https://www.investing.com/rss/news_285.rss"
+  - name: "MarketWatch Commodities"
+    url: "https://feeds.marketwatch.com/marketwatch/marketpulse/"
