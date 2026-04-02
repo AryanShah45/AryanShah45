@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h2 class="text-2xl font-bold text-gray-800">Settings</h2>
+    <p class="text-gray-500 mt-1">Configure your content automation pipeline</p>
+</div>
+
+{% if request.query_params.get('saved') %}
+<div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+    <p class="text-green-700 text-sm font-medium">Settings saved successfully!</p>
+</div>
+{% endif %}
+
+<form method="post" action="/api/settings" class="max-w-3xl space-y-8">
+    <!-- LinkedIn Settings -->
+    <div class="stat-card">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">LinkedIn Schedule</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Posting Days</label>
+                <div class="space-y-2">
+                    {% for day in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] %}
+                    <label class="flex items-center gap-2">
+                        <input type="checkbox" name="posting_days" value="{{ day }}" {% if day in settings.linkedin.posting_days %}checked{% endif %} class="rounded border-gray-300 text-brand focus:ring-brand">
+                        <span class="text-sm">{{ day | title }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Posting Time</label>
+                    <input type="time" name="posting_time" value="{{ settings.linkedin.posting_time }}" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-brand focus:border-brand">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
+                    <input type="text" name="timezone" value="{{ settings.linkedin.timezone }}" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-brand focus:border-brand">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Settings -->
+    <div class="stat-card">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Content</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Min Length (chars)</label>
+                <input type="number" name="min_length" value="{{ settings.content.min_length }}" min="100" max="3000" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-brand focus:border-brand">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Max Length (chars)</label>
+                <input type="number" name="max_length" value="{{ settings.content.max_length }}" min="100" max="3000" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-brand focus:border-brand">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Hashtags Count</label>
+                <input type="number" name="hashtags_count" value="{{ settings.content.hashtags_count }}" min="0" max="10" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-brand focus:border-brand">
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Engines (read-only display) -->
+    <div class="stat-card">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">AI Engines</h3>
+        <p class="text-xs text-gray-400 mb-4">Engine configuration is managed in settings.yaml</p>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-gray-500 text-xs">Primary Writer</p>
+                <p class="font-medium">{{ settings.ai_engines.primary_writer | title }}</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-gray-500 text-xs">Research</p>
+                <p class="font-medium">{{ settings.ai_engines.research | join(', ') | title }}</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-gray-500 text-xs">Analysis</p>
+                <p class="font-medium">{{ settings.ai_engines.analysis | title }}</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-gray-500 text-xs">Enhancement</p>
+                <p class="font-medium">{{ settings.ai_engines.enhancement | title }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visual Branding -->
+    <div class="stat-card">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Visual Branding</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Primary Color</label>
+                <div class="flex items-center gap-3">
+                    <input type="color" name="color_primary" value="{{ settings.visuals.brand_colors.primary }}" class="w-10 h-10 rounded border-0 cursor-pointer">
+                    <span class="text-sm text-gray-500 font-mono">{{ settings.visuals.brand_colors.primary }}</span>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Secondary Color</label>
+                <div class="flex items-center gap-3">
+                    <input type="color" name="color_secondary" value="{{ settings.visuals.brand_colors.secondary }}" class="w-10 h-10 rounded border-0 cursor-pointer">
+                    <span class="text-sm text-gray-500 font-mono">{{ settings.visuals.brand_colors.secondary }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Learning Settings -->
+    <div class="stat-card">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Learning</h3>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-gray-500 text-xs">Tracking Intervals</p>
+                <p class="font-medium">{{ settings.learning.track_intervals_hours | join('h, ') }}h</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-gray-500 text-xs">Min Posts for Insights</p>
+                <p class="font-medium">{{ settings.learning.min_posts_for_insights }}</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-gray-500 text-xs">Optimization Frequency</p>
+                <p class="font-medium">{{ settings.learning.optimization_frequency | title }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- RSS Feeds (read-only) -->
+    <div class="stat-card">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">RSS Feeds</h3>
+        <p class="text-xs text-gray-400 mb-4">Feed configuration is managed in settings.yaml</p>
+        <div class="space-y-2">
+            {% for feed in settings.rss_feeds %}
+            <div class="flex items-center gap-3 text-sm">
+                <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                <span class="font-medium">{{ feed.name }}</span>
+                <span class="text-gray-400 text-xs truncate">{{ feed.url }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="flex gap-4">
+        <button type="submit" class="bg-brand text-white px-6 py-3 rounded-lg font-medium hover:bg-brand-light transition">Save Settings</button>
+        <a href="/settings" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition">Reset</a>
+    </div>
+</form>
+{% endblock %}

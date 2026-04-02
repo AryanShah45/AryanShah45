@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Publish{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h2 class="text-2xl font-bold text-gray-800">Publish to LinkedIn</h2>
+    <p class="text-gray-500 mt-1">Post approved content to your LinkedIn profile</p>
+</div>
+
+{% if not has_token %}
+<div class="stat-card border-l-4 border-yellow-400 mb-6">
+    <p class="text-yellow-700 font-medium">LinkedIn not connected</p>
+    <p class="text-sm text-yellow-600 mt-1">Set LINKEDIN_ACCESS_TOKEN in your .env file or run the auth setup.</p>
+</div>
+{% endif %}
+
+{% if approved %}
+<div class="flex justify-between items-center mb-6">
+    <p class="text-gray-600">{{ approved|length }} post(s) ready to publish</p>
+    {% if has_token %}
+    <button onclick="publishAll()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-light transition">Publish All</button>
+    {% endif %}
+</div>
+
+<div class="grid gap-4">
+    {% for post in approved %}
+    <div class="stat-card" id="post-{{ post.id }}">
+        <div class="flex justify-between items-start">
+            <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                    <h3 class="font-semibold text-gray-800">{{ post.id }}</h3>
+                    <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs">Approved</span>
+                    {% if post.visual_type and post.visual_type != 'none' %}
+                    <span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-xs">{{ post.visual_type | title }}</span>
+                    {% endif %}
+                </div>
+                <p class="text-sm text-gray-500 mb-2">
+                    {{ post.topic | replace("_", " ") | title if post.topic else "" }}
+                    &middot; Approved {{ post.approved_at[:10] if post.approved_at else "" }}
+                </p>
+                <p class="text-gray-600 text-sm">{{ post.post.body[:200] if post.post and post.post.body else "" }}{% if post.post and post.post.body and post.post.body|length > 200 %}...{% endif %}</p>
+            </div>
+            {% if has_token %}
+            <button onclick="publishPost('{{ post.id }}')" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-light transition whitespace-nowrap ml-4">
+                Publish
+            </button>
+            {% endif %}
+        </div>
+        <div id="status-{{ post.id }}" class="hidden mt-3 text-sm"></div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="stat-card text-center py-12">
+    <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+    <p class="text-gray-400 mb-4">No approved posts to publish</p>
+    <a href="/review" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-light transition">Review Drafts</a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function publishPost(draftId) {
+    if (!confirm(`Publish post ${draftId} to LinkedIn?`)) return;
+
+    const statusEl = document.getElementById(`status-${draftId}`);
+    statusEl.classList.remove('hidden');
+    statusEl.innerHTML = '<span class="text-blue-600">Publishing...</span>';
+
+    try {
+        const resp = await fetch(`/api/publish/${draftId}`, { method: 'POST' });
+        const data = await resp.json();
+
+        if (data.task_id) {
+            pollPublish(data.task_id, draftId);
+        }
+    } catch (err) {
+        statusEl.innerHTML = `<span class="text-red-600">Error: ${err.message}</span>`;
+    }
+}
+
+function pollPublish(taskId, draftId) {
+    const statusEl = document.getElementById(`status-${draftId}`);
+    const interval = setInterval(async () => {
+        const resp = await fetch(`/api/tasks/${taskId}`);
+        const data = await resp.json();
+        if (data.status === 'complete') {
+            clearInterval(interval);
+            statusEl.innerHTML = '<span class="text-green-600">Published successfully!</span>';
+            setTimeout(() => location.reload(), 1500);
+        } else if (data.status === 'failed') {
+            clearInterval(interval);
+            statusEl.innerHTML = `<span class="text-red-600">Failed: ${data.error}</span>`;
+        }
+    }, 3000);
+}
+
+async function publishAll() {
+    if (!confirm('Publish all approved posts to LinkedIn?')) return;
+    const resp = await fetch('/api/publish/all', { method: 'POST' });
+    const data = await resp.json();
+    if (data.task_ids) {
+        alert(`Publishing ${data.task_ids.length} post(s)...`);
+        setTimeout(() => location.reload(), 10000);
+    }
+}
+</script>
+{% endblock %}

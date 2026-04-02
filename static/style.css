@@ -1,0 +1,46 @@
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    color: #cbd5e1;
+    transition: all 0.15s ease;
+    font-size: 0.9rem;
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.nav-link.active {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    border-left: 3px solid #C5A572;
+    font-weight: 600;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.post-preview {
+    white-space: pre-line;
+    line-height: 1.7;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+    border: 3px solid #e5e7eb;
+    border-top-color: #1B365D;
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+}

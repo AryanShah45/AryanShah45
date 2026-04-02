@@ -318,5 +318,17 @@ def setup():
     auth.setup_interactive()
 
 
+@cli.command()
+@click.option("--host", default="127.0.0.1", help="Host to bind to")
+@click.option("--port", default=8000, type=int, help="Port to bind to")
+@click.option("--reload", is_flag=True, help="Enable auto-reload for development")
+def dashboard(host, port, reload):
+    """Launch the web dashboard."""
+    import uvicorn
+
+    console.print(f"[bold]Starting web dashboard at http://{host}:{port}[/bold]")
+    uvicorn.run("src.web.app:app", host=host, port=port, reload=reload)
+
+
 if __name__ == "__main__":
     cli()

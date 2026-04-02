@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Review Drafts{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h2 class="text-2xl font-bold text-gray-800">Review Drafts</h2>
+    <p class="text-gray-500 mt-1">Approve, edit, or reject pending posts</p>
+</div>
+
+{% if drafts %}
+<div class="grid gap-4">
+    {% for draft in drafts %}
+    <div class="stat-card hover:shadow-md transition">
+        <div class="flex justify-between items-start">
+            <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                    <h3 class="font-semibold text-gray-800">{{ draft.id }}</h3>
+                    <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">{{ draft.post_type | replace("_", " ") | title }}</span>
+                    {% if draft.visual_type and draft.visual_type != 'none' %}
+                    <span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-xs">{{ draft.visual_type | title }}</span>
+                    {% endif %}
+                </div>
+                <p class="text-sm text-gray-500 mb-2">
+                    {{ draft.topic | replace("_", " ") | title }}
+                    &middot; {{ draft.hook_style | replace("_", " ") | title if draft.hook_style else "" }}
+                    &middot; {{ draft.created_at[:10] if draft.created_at else "" }}
+                </p>
+                <p class="text-gray-600 text-sm">{{ draft.post.body[:200] if draft.post and draft.post.body else "No content" }}{% if draft.post and draft.post.body and draft.post.body|length > 200 %}...{% endif %}</p>
+            </div>
+            <a href="/review/{{ draft.id }}" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-light transition whitespace-nowrap ml-4">
+                Review
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="stat-card text-center py-12">
+    <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+    <p class="text-gray-400 mb-4">No pending drafts to review</p>
+    <a href="/generate" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-light transition">Generate New Post</a>
+</div>
+{% endif %}
+{% endblock %}
