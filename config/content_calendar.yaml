@@ -1,0 +1,161 @@
+# Content Calendar — 6-week rotation cycle
+# Each week focuses on different subtopics across Mon/Wed/Fri
+# Post types rotate: insight, analysis, story, data-driven, opinion, current-event
+
+weeks:
+  week_1:
+    monday:
+      topic: crude_oil_and_energy
+      post_type: current_event
+      visual: carousel
+      theme: "What's moving in energy markets this week"
+    wednesday:
+      topic: metals_and_mining
+      post_type: analysis
+      visual: image
+      theme: "Deep dive into a metal's supply-demand dynamics"
+    friday:
+      topic: geopolitics_and_trade
+      post_type: opinion
+      visual: none
+      theme: "Geopolitical event and its commodity impact"
+
+  week_2:
+    monday:
+      topic: agriculture_and_food
+      post_type: data_driven
+      visual: carousel
+      theme: "Agricultural commodity trends with data"
+    wednesday:
+      topic: shipping_and_logistics
+      post_type: story
+      visual: image
+      theme: "Behind the scenes of global supply chains"
+    friday:
+      topic: sustainability_and_esg
+      post_type: insight
+      visual: none
+      theme: "ESG trends reshaping commodity markets"
+
+  week_3:
+    monday:
+      topic: crude_oil_and_energy
+      post_type: analysis
+      visual: image
+      theme: "OPEC decisions and energy market dynamics"
+    wednesday:
+      topic: metals_and_mining
+      post_type: current_event
+      visual: carousel
+      theme: "Critical minerals and the energy transition"
+    friday:
+      topic: agriculture_and_food
+      post_type: opinion
+      visual: none
+      theme: "Food security and climate impact on crops"
+
+  week_4:
+    monday:
+      topic: geopolitics_and_trade
+      post_type: data_driven
+      visual: carousel
+      theme: "Trade flows, tariffs, and commodity prices"
+    wednesday:
+      topic: shipping_and_logistics
+      post_type: analysis
+      visual: image
+      theme: "Freight rates, port congestion, route shifts"
+    friday:
+      topic: crude_oil_and_energy
+      post_type: story
+      visual: none
+      theme: "The human side of energy markets"
+
+  week_5:
+    monday:
+      topic: metals_and_mining
+      post_type: insight
+      visual: carousel
+      theme: "Copper, lithium, and the infrastructure boom"
+    wednesday:
+      topic: sustainability_and_esg
+      post_type: current_event
+      visual: image
+      theme: "Carbon markets and green commodities"
+    friday:
+      topic: geopolitics_and_trade
+      post_type: analysis
+      visual: none
+      theme: "Sanctions, embargoes, and market disruption"
+
+  week_6:
+    monday:
+      topic: agriculture_and_food
+      post_type: story
+      visual: image
+      theme: "From farm to port — how commodities move"
+    wednesday:
+      topic: crude_oil_and_energy
+      post_type: data_driven
+      visual: carousel
+      theme: "Energy prices, inventories, and forecasts"
+    friday:
+      topic: shipping_and_logistics
+      post_type: insight
+      visual: none
+      theme: "Supply chain innovation and disruption"
+
+# Hook style rotation (cycles independently)
+hook_styles:
+  - surprising_stat
+  - provocative_question
+  - bold_claim
+  - personal_observation
+  - current_event_reference
+  - contrarian_take
+
+# Hashtag pools by topic
+hashtags:
+  crude_oil_and_energy:
+    - "#CrudeOil"
+    - "#EnergyMarkets"
+    - "#OPEC"
+    - "#OilAndGas"
+    - "#EnergyTransition"
+    - "#NaturalGas"
+  metals_and_mining:
+    - "#Mining"
+    - "#Metals"
+    - "#Copper"
+    - "#Lithium"
+    - "#CriticalMinerals"
+    - "#Steel"
+  agriculture_and_food:
+    - "#Agriculture"
+    - "#FoodSecurity"
+    - "#Grains"
+    - "#SoftCommodities"
+    - "#AgriMarkets"
+  shipping_and_logistics:
+    - "#SupplyChain"
+    - "#Shipping"
+    - "#Logistics"
+    - "#FreightRates"
+    - "#GlobalTrade"
+  geopolitics_and_trade:
+    - "#Geopolitics"
+    - "#TradeWar"
+    - "#Sanctions"
+    - "#GlobalMarkets"
+    - "#CommodityTrading"
+  sustainability_and_esg:
+    - "#ESG"
+    - "#Sustainability"
+    - "#CarbonMarkets"
+    - "#GreenEnergy"
+    - "#ClimateChange"
+  universal:
+    - "#CommodityMarkets"
+    - "#SupplyChain"
+    - "#Markets"
+    - "#Trading"

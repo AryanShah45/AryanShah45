@@ -1,0 +1,33 @@
+{
+  "name": "commodity_insight_carousel",
+  "description": "Standard carousel template for commodity market insights",
+  "slide_count": 6,
+  "slides": {
+    "title": {
+      "type": "title",
+      "background": "primary",
+      "elements": ["title_text", "subtitle_text", "accent_bar"]
+    },
+    "content": {
+      "type": "content",
+      "background": "white",
+      "elements": ["heading", "body_text", "accent_bar_left"]
+    },
+    "data": {
+      "type": "data_highlight",
+      "background": "white",
+      "elements": ["big_number", "description", "source_text"]
+    },
+    "cta": {
+      "type": "call_to_action",
+      "background": "primary",
+      "elements": ["cta_text", "follow_text", "accent_bar"]
+    }
+  },
+  "color_scheme": {
+    "primary": "#1B365D",
+    "secondary": "#C5A572",
+    "background": "#FFFFFF",
+    "text": "#2D2D2D"
+  }
+}
