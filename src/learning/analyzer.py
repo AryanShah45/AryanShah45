@@ -2,12 +2,14 @@
 
 import json
 import logging
+import os
 from collections import defaultdict
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
+_BASE = Path(__file__).resolve().parent.parent.parent
+DATA_DIR = (Path("/tmp/linkedin_automation") if os.getenv("VERCEL") else _BASE) / "data"
 
 
 class PerformanceAnalyzer:

@@ -20,11 +20,15 @@ from .tasks import create_task, run_generation, run_publish, task_store
 logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-DRAFTS_DIR = BASE_DIR / "posts" / "drafts"
-APPROVED_DIR = BASE_DIR / "posts" / "approved"
-PUBLISHED_DIR = BASE_DIR / "posts" / "published"
-BRIEFINGS_DIR = BASE_DIR / "posts" / "briefings"
-DATA_DIR = BASE_DIR / "data"
+IS_VERCEL = bool(os.getenv("VERCEL"))
+
+# Vercel filesystem is read-only except /tmp — use /tmp for writable dirs
+WRITABLE_DIR = Path("/tmp/linkedin_automation") if IS_VERCEL else BASE_DIR
+DRAFTS_DIR = WRITABLE_DIR / "posts" / "drafts"
+APPROVED_DIR = WRITABLE_DIR / "posts" / "approved"
+PUBLISHED_DIR = WRITABLE_DIR / "posts" / "published"
+BRIEFINGS_DIR = WRITABLE_DIR / "posts" / "briefings"
+DATA_DIR = WRITABLE_DIR / "data"
 
 app = FastAPI(title="LinkedIn Content Dashboard")
 
@@ -35,7 +39,9 @@ templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 @app.on_event("startup")
 async def startup():
-    load_dotenv(BASE_DIR / ".env")
+    env_file = BASE_DIR / ".env"
+    if env_file.exists():
+        load_dotenv(env_file)
     for d in [DRAFTS_DIR, APPROVED_DIR, PUBLISHED_DIR, BRIEFINGS_DIR, DATA_DIR]:
         d.mkdir(parents=True, exist_ok=True)
 
@@ -136,12 +142,15 @@ async def generate_page(request: Request):
     from src.content.templates import POST_STRUCTURES
 
     subtopics = settings.get("content", {}).get("subtopics", [])
-    post_types = list(POST_STRUCTURES.keys())
+    post_type_info = [
+        {"key": k, "description": v["description"]}
+        for k, v in POST_STRUCTURES.items()
+    ]
 
     return templates.TemplateResponse(request, "generate.html", {
         "page": "generate",
         "subtopics": subtopics,
-        "post_types": post_types,
+        "post_types": post_type_info,
     })
 
 
@@ -266,11 +275,21 @@ async def settings_page(request: Request):
 
 
 @app.post("/api/generate")
-async def api_generate(
-    background_tasks: BackgroundTasks,
-    topic: str = Form(None),
-    post_type: str = Form(None),
-):
+async def api_generate(background_tasks: BackgroundTasks, request: Request):
+    form = await request.form()
+
+    # Multi-select: collect all checked topics and post_types
+    topics = form.getlist("topics")
+    custom_topic = form.get("custom_topic", "").strip()
+    post_types = form.getlist("post_types")
+
+    # Combine into comma-separated strings for the generator
+    topic = ", ".join(t.replace("_", " ") for t in topics) if topics else None
+    if custom_topic:
+        topic = f"{topic}, {custom_topic}" if topic else custom_topic
+
+    post_type = ", ".join(post_types) if post_types else None
+
     task_id = create_task()
     background_tasks.add_task(run_generation, task_id, topic or None, post_type or None)
     return JSONResponse({"task_id": task_id, "status": "running"})
@@ -428,11 +447,12 @@ async def api_save_keys(request: Request):
         for form_field, env_var in key_map.items():
             value = form.get(form_field, "").strip()
             if value:
-                set_key(env_path, env_var, value)
+                if not IS_VERCEL:
+                    set_key(env_path, env_var, value)
                 os.environ[env_var] = value
             elif not value and os.getenv(env_var):
-                # Clear the key if field was emptied
-                set_key(env_path, env_var, "")
+                if not IS_VERCEL:
+                    set_key(env_path, env_var, "")
                 os.environ.pop(env_var, None)
 
         return RedirectResponse("/settings?saved=keys", status_code=303)
@@ -454,10 +474,12 @@ async def api_save_linkedin_credentials(request: Request):
         client_secret = form.get("client_secret", "").strip()
 
         if client_id:
-            set_key(env_path, "LINKEDIN_CLIENT_ID", client_id)
+            if not IS_VERCEL:
+                set_key(env_path, "LINKEDIN_CLIENT_ID", client_id)
             os.environ["LINKEDIN_CLIENT_ID"] = client_id
         if client_secret:
-            set_key(env_path, "LINKEDIN_CLIENT_SECRET", client_secret)
+            if not IS_VERCEL:
+                set_key(env_path, "LINKEDIN_CLIENT_SECRET", client_secret)
             os.environ["LINKEDIN_CLIENT_SECRET"] = client_secret
 
         return RedirectResponse("/settings?saved=linkedin", status_code=303)
@@ -518,9 +540,10 @@ async def api_save_settings(request: Request):
         colors["primary"] = form.get("color_primary", colors.get("primary", "#1B365D"))
         colors["secondary"] = form.get("color_secondary", colors.get("secondary", "#C5A572"))
 
-        settings_path = BASE_DIR / "config" / "settings.yaml"
-        with open(settings_path, "w") as f:
-            yaml.safe_dump(settings, f, default_flow_style=False, sort_keys=False)
+        if not IS_VERCEL:
+            settings_path = BASE_DIR / "config" / "settings.yaml"
+            with open(settings_path, "w") as f:
+                yaml.safe_dump(settings, f, default_flow_style=False, sort_keys=False)
 
         return RedirectResponse("/settings?saved=1", status_code=303)
     except Exception as e:

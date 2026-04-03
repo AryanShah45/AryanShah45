@@ -2,6 +2,7 @@
 
 import json
 import logging
+import os
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -10,8 +11,10 @@ from ..linkedin.analytics import LinkedInAnalytics
 logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-DATA_DIR = BASE_DIR / "data"
-PUBLISHED_DIR = BASE_DIR / "posts" / "published"
+IS_VERCEL = bool(os.getenv("VERCEL"))
+WRITABLE_DIR = Path("/tmp/linkedin_automation") if IS_VERCEL else BASE_DIR
+DATA_DIR = WRITABLE_DIR / "data"
+PUBLISHED_DIR = WRITABLE_DIR / "posts" / "published"
 
 
 class PerformanceTracker:

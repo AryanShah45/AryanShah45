@@ -12,6 +12,8 @@ from typing import Optional
 logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+IS_VERCEL = bool(os.getenv("VERCEL"))
+WRITABLE_DIR = Path("/tmp/linkedin_automation") if IS_VERCEL else BASE_DIR
 
 # In-memory task store (single-user tool, no persistence needed)
 task_store: dict[str, dict] = {}
@@ -70,7 +72,7 @@ async def run_generation(task_id: str, topic: Optional[str], post_type: Optional
         # Generate visuals if needed
         visual_type = result["visual_type"]
         if visual_type != "none":
-            draft_file = BASE_DIR / "posts" / "drafts" / f"{result['draft_id']}.json"
+            draft_file = WRITABLE_DIR / "posts" / "drafts" / f"{result['draft_id']}.json"
             with open(draft_file) as f:
                 draft_data = json.load(f)
 
@@ -119,8 +121,8 @@ async def run_publish(task_id: str, draft_id: str):
     load_dotenv(BASE_DIR / ".env")
 
     try:
-        approved_dir = BASE_DIR / "posts" / "approved"
-        published_dir = BASE_DIR / "posts" / "published"
+        approved_dir = WRITABLE_DIR / "posts" / "approved"
+        published_dir = WRITABLE_DIR / "posts" / "published"
         published_dir.mkdir(parents=True, exist_ok=True)
 
         draft_file = approved_dir / f"{draft_id}.json"

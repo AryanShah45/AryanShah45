@@ -2,6 +2,7 @@
 
 import json
 import logging
+import os
 from datetime import datetime
 from pathlib import Path
 
@@ -10,7 +11,9 @@ from ..ai_engines.base import AIEngine
 logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-BRIEFINGS_DIR = BASE_DIR / "posts" / "briefings"
+IS_VERCEL = bool(os.getenv("VERCEL"))
+WRITABLE_DIR = Path("/tmp/linkedin_automation") if IS_VERCEL else BASE_DIR
+BRIEFINGS_DIR = WRITABLE_DIR / "posts" / "briefings"
 
 
 class BriefingGenerator:

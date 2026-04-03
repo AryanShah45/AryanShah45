@@ -1,37 +1,96 @@
+/* Sidebar gradient */
+.sidebar-gradient {
+    background: linear-gradient(180deg, #1B365D 0%, #0F2341 100%);
+}
+
+/* Navigation links */
 .nav-link {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.75rem 1.5rem;
-    color: #cbd5e1;
+    padding: 0.65rem 1.5rem;
+    color: #94a3b8;
     transition: all 0.15s ease;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-left: 3px solid transparent;
 }
 
 .nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.08);
     color: #ffffff;
 }
 
 .nav-link.active {
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: rgba(255, 255, 255, 0.12);
     color: #ffffff;
-    border-left: 3px solid #C5A572;
+    border-left-color: #C5A572;
     font-weight: 600;
 }
 
+/* Stat cards */
 .stat-card {
     background: white;
-    border-radius: 0.75rem;
+    border-radius: 0.875rem;
     padding: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.2s ease;
 }
 
+.stat-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* Chip checkbox (selectable tags) */
+.chip-checkbox {
+    cursor: pointer;
+    display: block;
+}
+
+.chip-label {
+    display: block;
+    padding: 0.5rem 0.875rem;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 0.625rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #374151;
+    text-align: center;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.chip-label:hover {
+    border-color: #1B365D;
+    background: #f8fafc;
+}
+
+/* Large chip with description */
+.chip-label-lg {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    padding: 0.625rem 0.875rem;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 0.625rem;
+    font-size: 0.8125rem;
+    color: #374151;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.chip-label-lg:hover {
+    border-color: #1B365D;
+    background: #f8fafc;
+}
+
+/* Post preview */
 .post-preview {
     white-space: pre-line;
     line-height: 1.7;
 }
 
+/* Loading spinner */
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
@@ -43,4 +102,19 @@
     border-radius: 50%;
     width: 2rem;
     height: 2rem;
+    flex-shrink: 0;
+}
+
+/* Pulse delay utilities */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+
+/* Form input transitions */
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="time"],
+select,
+textarea {
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
