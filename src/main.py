@@ -48,6 +48,8 @@ def create_fusion_orchestrator():
         google_key=os.getenv("GOOGLE_API_KEY"),
         perplexity_key=os.getenv("PERPLEXITY_API_KEY"),
         xai_key=os.getenv("XAI_API_KEY"),
+        ollama_model=os.getenv("OLLAMA_MODEL"),
+        qwen_key=os.getenv("QWEN_API_KEY"),
     )
 
 

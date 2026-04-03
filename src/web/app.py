@@ -9,7 +9,7 @@ from datetime import datetime
 from pathlib import Path
 
 import yaml
-from dotenv import load_dotenv
+from dotenv import load_dotenv, set_key
 from fastapi import BackgroundTasks, FastAPI, Form, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -234,9 +234,31 @@ async def learning_page(request: Request):
 @app.get("/settings", response_class=HTMLResponse)
 async def settings_page(request: Request):
     settings, _ = load_config()
+
+    # Engine status: which keys/configs are set
+    engine_status = {
+        "anthropic": bool(os.getenv("ANTHROPIC_API_KEY")),
+        "openai": bool(os.getenv("OPENAI_API_KEY")),
+        "google": bool(os.getenv("GOOGLE_API_KEY")),
+        "perplexity": bool(os.getenv("PERPLEXITY_API_KEY")),
+        "xai": bool(os.getenv("XAI_API_KEY")),
+        "qwen": bool(os.getenv("QWEN_API_KEY")),
+        "ollama": bool(os.getenv("OLLAMA_MODEL")),
+    }
+    active_count = sum(engine_status.values())
+
+    # LinkedIn status
+    linkedin_status = {
+        "has_credentials": bool(os.getenv("LINKEDIN_CLIENT_ID") and os.getenv("LINKEDIN_CLIENT_SECRET")),
+        "has_token": bool(os.getenv("LINKEDIN_ACCESS_TOKEN")),
+    }
+
     return templates.TemplateResponse(request, "settings.html", {
         "page": "settings",
         "settings": settings,
+        "engine_status": engine_status,
+        "active_engines": active_count,
+        "linkedin_status": linkedin_status,
     })
 
 
@@ -381,6 +403,98 @@ async def api_optimize():
         return JSONResponse({"status": "ok", "report": report})
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)
+
+
+@app.post("/api/keys")
+async def api_save_keys(request: Request):
+    """Save AI engine API keys and Ollama model to .env and update os.environ."""
+    try:
+        form = await request.form()
+        env_path = str(BASE_DIR / ".env")
+
+        if not (BASE_DIR / ".env").exists():
+            (BASE_DIR / ".env").touch()
+
+        key_map = {
+            "anthropic_key": "ANTHROPIC_API_KEY",
+            "openai_key": "OPENAI_API_KEY",
+            "google_key": "GOOGLE_API_KEY",
+            "perplexity_key": "PERPLEXITY_API_KEY",
+            "xai_key": "XAI_API_KEY",
+            "qwen_key": "QWEN_API_KEY",
+            "ollama_model": "OLLAMA_MODEL",
+        }
+
+        for form_field, env_var in key_map.items():
+            value = form.get(form_field, "").strip()
+            if value:
+                set_key(env_path, env_var, value)
+                os.environ[env_var] = value
+            elif not value and os.getenv(env_var):
+                # Clear the key if field was emptied
+                set_key(env_path, env_var, "")
+                os.environ.pop(env_var, None)
+
+        return RedirectResponse("/settings?saved=keys", status_code=303)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+@app.post("/api/linkedin/credentials")
+async def api_save_linkedin_credentials(request: Request):
+    """Save LinkedIn OAuth credentials to .env."""
+    try:
+        form = await request.form()
+        env_path = str(BASE_DIR / ".env")
+
+        if not (BASE_DIR / ".env").exists():
+            (BASE_DIR / ".env").touch()
+
+        client_id = form.get("client_id", "").strip()
+        client_secret = form.get("client_secret", "").strip()
+
+        if client_id:
+            set_key(env_path, "LINKEDIN_CLIENT_ID", client_id)
+            os.environ["LINKEDIN_CLIENT_ID"] = client_id
+        if client_secret:
+            set_key(env_path, "LINKEDIN_CLIENT_SECRET", client_secret)
+            os.environ["LINKEDIN_CLIENT_SECRET"] = client_secret
+
+        return RedirectResponse("/settings?saved=linkedin", status_code=303)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+@app.get("/auth/linkedin")
+async def auth_linkedin_start():
+    """Start LinkedIn OAuth flow — redirects to LinkedIn authorization page."""
+    from src.linkedin.auth import LinkedInAuth
+
+    auth = LinkedInAuth()
+    if not auth.is_configured:
+        return RedirectResponse("/settings?error=linkedin_not_configured", status_code=303)
+
+    # Use the dashboard callback URL instead of CLI's localhost:8080
+    auth_url = auth.get_authorization_url()
+    return RedirectResponse(auth_url, status_code=303)
+
+
+@app.get("/auth/linkedin/callback")
+async def auth_linkedin_callback(request: Request, code: str = None, error: str = None):
+    """Handle LinkedIn OAuth callback — exchange code for tokens."""
+    if error or not code:
+        return RedirectResponse(f"/settings?error=linkedin_auth_failed", status_code=303)
+
+    try:
+        from src.linkedin.auth import LinkedInAuth
+
+        auth = LinkedInAuth()
+        await auth.exchange_code(code)
+        os.environ["LINKEDIN_ACCESS_TOKEN"] = auth.access_token
+        return RedirectResponse("/settings?saved=linkedin_connected", status_code=303)
+    except Exception as e:
+        logger.exception("LinkedIn OAuth callback failed")
+        return RedirectResponse(f"/settings?error=linkedin_token_failed", status_code=303)
 
 
 @app.post("/api/settings")

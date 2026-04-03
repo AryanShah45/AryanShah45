@@ -32,6 +32,8 @@ class FusionOrchestrator:
         google_key: str = None,
         perplexity_key: str = None,
         xai_key: str = None,
+        ollama_model: str = None,
+        qwen_key: str = None,
     ) -> "FusionOrchestrator":
         """Create orchestrator from API keys, skipping engines without keys."""
         engines = {}
@@ -51,6 +53,12 @@ class FusionOrchestrator:
         if xai_key:
             from .grok_engine import GrokEngine
             engines["grok"] = GrokEngine(api_key=xai_key)
+        if ollama_model:
+            from .ollama_engine import OllamaEngine
+            engines["ollama"] = OllamaEngine(model=ollama_model)
+        if qwen_key:
+            from .qwen_engine import QwenEngine
+            engines["qwen"] = QwenEngine(api_key=qwen_key)
 
         if not engines:
             raise ValueError("At least one AI engine API key is required.")

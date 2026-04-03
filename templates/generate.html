@@ -11,13 +11,20 @@
     <form id="genForm" method="post">
         <div class="mb-6">
             <label class="block text-sm font-medium text-gray-700 mb-2">Topic</label>
-            <select name="topic" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-brand focus:border-brand">
+            <select name="topic" id="topicSelect" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-brand focus:border-brand">
                 <option value="">Auto (from content calendar)</option>
                 {% for topic in subtopics %}
                 <option value="{{ topic }}">{{ topic | replace("_", " ") | title }}</option>
                 {% endfor %}
+                <option value="__custom__">Custom Topic...</option>
             </select>
             <p class="text-xs text-gray-400 mt-1">Leave empty to use the content calendar schedule</p>
+        </div>
+
+        <div class="mb-6 hidden" id="customTopicGroup">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Custom Topic</label>
+            <input type="text" id="customTopicInput" placeholder="e.g. AI disruption in global shipping, lithium supply chain crisis" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-brand focus:border-brand">
+            <p class="text-xs text-gray-400 mt-1">Type any topic — the AI pipeline will research and write about it</p>
         </div>
 
         <div class="mb-6">
@@ -66,10 +73,31 @@
 
 {% block scripts %}
 <script>
+// Toggle custom topic input
+document.getElementById('topicSelect').addEventListener('change', (e) => {
+    const customGroup = document.getElementById('customTopicGroup');
+    if (e.target.value === '__custom__') {
+        customGroup.classList.remove('hidden');
+        document.getElementById('customTopicInput').focus();
+    } else {
+        customGroup.classList.add('hidden');
+    }
+});
+
 document.getElementById('genForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const form = e.target;
     const formData = new FormData(form);
+
+    // If custom topic selected, use the text input value instead
+    if (formData.get('topic') === '__custom__') {
+        const customTopic = document.getElementById('customTopicInput').value.trim();
+        if (!customTopic) {
+            alert('Please enter a custom topic.');
+            return;
+        }
+        formData.set('topic', customTopic);
+    }
 
     document.getElementById('generate-form').classList.add('opacity-50');
     document.getElementById('submitBtn').disabled = true;
