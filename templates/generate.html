@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% block title %}Generate Content{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand to-brand-light flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">Generate Content</h2>
+            <p class="text-gray-500 text-sm">Select topics and post styles, then let the AI pipeline create your post</p>
+        </div>
+    </div>
+</div>
+
+<div class="stat-card max-w-3xl" id="generate-form">
+    <form id="genForm" method="post">
+        <!-- Topics -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-3">
+                <label class="text-sm font-semibold text-gray-700">Topics</label>
+                <div class="flex gap-2">
+                    <button type="button" onclick="toggleAll('topics', true)" class="text-xs text-brand hover:underline">Select All</button>
+                    <span class="text-xs text-gray-300">|</span>
+                    <button type="button" onclick="toggleAll('topics', false)" class="text-xs text-gray-400 hover:underline">Clear</button>
+                </div>
+            </div>
+            <p class="text-xs text-gray-400 mb-3">Select one or more topics to blend. Leave all unchecked to use the content calendar.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                {% for topic in subtopics %}
+                <label class="chip-checkbox">
+                    <input type="checkbox" name="topics" value="{{ topic }}" class="sr-only peer">
+                    <span class="chip-label peer-checked:bg-brand peer-checked:text-white peer-checked:border-brand">
+                        {{ topic | replace("_", " ") | title }}
+                    </span>
+                </label>
+                {% endfor %}
+                <label class="chip-checkbox">
+                    <input type="checkbox" id="customTopicCheck" class="sr-only peer">
+                    <span class="chip-label peer-checked:bg-accent peer-checked:text-white peer-checked:border-accent">
+                        + Custom Topic
+                    </span>
+                </label>
+            </div>
+            <!-- Custom topic input -->
+            <div class="mt-3 hidden" id="customTopicGroup">
+                <input type="text" name="custom_topic" id="customTopicInput" placeholder="e.g. AI disruption in global shipping, lithium supply chain crisis" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition">
+            </div>
+        </div>
+
+        <!-- Post Types -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-3">
+                <label class="text-sm font-semibold text-gray-700">Post Type</label>
+                <div class="flex gap-2">
+                    <button type="button" onclick="toggleAll('post_types', true)" class="text-xs text-brand hover:underline">Select All</button>
+                    <span class="text-xs text-gray-300">|</span>
+                    <button type="button" onclick="toggleAll('post_types', false)" class="text-xs text-gray-400 hover:underline">Clear</button>
+                </div>
+            </div>
+            <p class="text-xs text-gray-400 mb-3">Select one or more styles. Multiple styles will be blended for a unique post.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {% for pt in post_types %}
+                <label class="chip-checkbox">
+                    <input type="checkbox" name="post_types" value="{{ pt.key }}" class="sr-only peer">
+                    <span class="chip-label-lg peer-checked:bg-brand peer-checked:text-white peer-checked:border-brand">
+                        <span class="font-medium">{{ pt.key | replace("_", " ") | title }}</span>
+                        <span class="text-xs opacity-70">{{ pt.description }}</span>
+                    </span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-brand to-brand-light text-white py-3.5 rounded-xl font-semibold hover:shadow-lg hover:shadow-brand/20 transition-all duration-200 active:scale-[0.98]">
+            Generate Post
+        </button>
+    </form>
+</div>
+
+<!-- Progress indicator (hidden by default) -->
+<div class="stat-card max-w-3xl mt-6 hidden" id="progress-card">
+    <div class="flex items-center gap-4">
+        <div class="spinner"></div>
+        <div>
+            <p class="font-semibold text-gray-800" id="progress-text">Generating content...</p>
+            <p class="text-sm text-gray-500">Running the multi-AI pipeline (research, draft, enhance, fuse)</p>
+        </div>
+    </div>
+    <div class="mt-4 grid grid-cols-4 gap-2">
+        <div class="h-1.5 rounded-full bg-brand animate-pulse"></div>
+        <div class="h-1.5 rounded-full bg-brand/60 animate-pulse delay-100"></div>
+        <div class="h-1.5 rounded-full bg-brand/30 animate-pulse delay-200"></div>
+        <div class="h-1.5 rounded-full bg-gray-200"></div>
+    </div>
+</div>
+
+<!-- Result (hidden by default) -->
+<div class="stat-card max-w-3xl mt-6 hidden" id="result-card">
+    <div class="flex items-center gap-3 mb-4">
+        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <p class="font-semibold text-gray-800">Draft generated successfully!</p>
+    </div>
+    <div id="result-details" class="text-sm text-gray-600 mb-4 space-y-1"></div>
+    <a id="review-link" href="/review" class="inline-flex items-center gap-2 bg-gradient-to-r from-brand to-brand-light text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:shadow-lg transition-all">
+        Review Draft
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    </a>
+</div>
+
+<!-- Error (hidden by default) -->
+<div class="stat-card max-w-3xl mt-6 hidden border-l-4 border-red-400" id="error-card">
+    <p class="font-semibold text-red-700">Generation failed</p>
+    <p class="text-sm text-red-600 mt-1" id="error-text"></p>
+    <button onclick="resetForm()" class="mt-3 text-sm text-red-500 hover:underline">Try again</button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Toggle custom topic input
+document.getElementById('customTopicCheck').addEventListener('change', (e) => {
+    const customGroup = document.getElementById('customTopicGroup');
+    if (e.target.checked) {
+        customGroup.classList.remove('hidden');
+        document.getElementById('customTopicInput').focus();
+    } else {
+        customGroup.classList.add('hidden');
+        document.getElementById('customTopicInput').value = '';
+    }
+});
+
+// Select All / Clear helpers
+function toggleAll(name, checked) {
+    document.querySelectorAll(`input[name="${name}"]`).forEach(cb => {
+        cb.checked = checked;
+    });
+}
+
+function resetForm() {
+    document.getElementById('generate-form').classList.remove('opacity-50');
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('error-card').classList.add('hidden');
+}
+
+document.getElementById('genForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+
+    document.getElementById('generate-form').classList.add('opacity-50');
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('progress-card').classList.remove('hidden');
+    document.getElementById('result-card').classList.add('hidden');
+    document.getElementById('error-card').classList.add('hidden');
+
+    try {
+        const resp = await fetch('/api/generate', { method: 'POST', body: formData });
+        const data = await resp.json();
+
+        if (data.task_id) {
+            pollTask(data.task_id);
+        }
+    } catch (err) {
+        showError(err.message);
+    }
+});
+
+function pollTask(taskId) {
+    const interval = setInterval(async () => {
+        try {
+            const resp = await fetch(`/api/tasks/${taskId}`);
+            const data = await resp.json();
+
+            if (data.status === 'complete') {
+                clearInterval(interval);
+                showResult(data.result);
+            } else if (data.status === 'failed') {
+                clearInterval(interval);
+                showError(data.error || 'Unknown error');
+            }
+        } catch (err) {
+            clearInterval(interval);
+            showError(err.message);
+        }
+    }, 3000);
+}
+
+function showResult(result) {
+    document.getElementById('progress-card').classList.add('hidden');
+    document.getElementById('result-card').classList.remove('hidden');
+    document.getElementById('generate-form').classList.remove('opacity-50');
+
+    const details = document.getElementById('result-details');
+    details.innerHTML = `
+        <p>Draft ID: <strong>${result.draft_id}</strong></p>
+        <p>Topic: ${result.topic.replace(/_/g, ' ')}</p>
+        <p>Type: ${result.post_type.replace(/_/g, ' ')}</p>
+        <p>Tokens used: ${result.tokens_used}</p>
+    `;
+    document.getElementById('review-link').href = `/review/${result.draft_id}`;
+}
+
+function showError(msg) {
+    document.getElementById('progress-card').classList.add('hidden');
+    document.getElementById('error-card').classList.remove('hidden');
+    document.getElementById('error-text').textContent = msg;
+    document.getElementById('generate-form').classList.remove('opacity-50');
+    document.getElementById('submitBtn').disabled = false;
+}
+</script>
+{% endblock %}

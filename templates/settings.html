@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand to-brand-light flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </div>
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">Settings</h2>
+            <p class="text-gray-500 text-sm">Configure your content automation pipeline</p>
+        </div>
+    </div>
+</div>
+
+{% if request.query_params.get('saved') %}
+<div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+    <p class="text-green-700 text-sm font-medium">
+        {% if request.query_params.get('saved') == 'keys' %}API keys saved successfully!
+        {% elif request.query_params.get('saved') == 'linkedin' %}LinkedIn credentials saved!
+        {% elif request.query_params.get('saved') == 'linkedin_connected' %}LinkedIn connected successfully!
+        {% else %}Settings saved successfully!{% endif %}
+    </p>
+</div>
+{% endif %}
+
+{% if request.query_params.get('error') %}
+<div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+    <p class="text-red-700 text-sm font-medium">
+        {% if request.query_params.get('error') == 'linkedin_not_configured' %}Please save your LinkedIn Client ID and Secret first.
+        {% elif request.query_params.get('error') == 'linkedin_auth_failed' %}LinkedIn authorization was denied or failed.
+        {% elif request.query_params.get('error') == 'linkedin_token_failed' %}Failed to exchange LinkedIn authorization code for tokens.
+        {% else %}An error occurred.{% endif %}
+    </p>
+</div>
+{% endif %}
+
+<!-- AI Engine API Keys -->
+<div class="stat-card max-w-3xl mb-8">
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <h3 class="text-lg font-semibold text-gray-700">AI Engine Keys</h3>
+            <p class="text-xs text-gray-400 mt-1">Configure which AI engines power your content pipeline</p>
+        </div>
+        <span class="text-sm font-medium px-3 py-1 rounded-full {% if active_engines > 0 %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+            {{ active_engines }} active
+        </span>
+    </div>
+
+    <form method="post" action="/api/keys" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Cloud Engines -->
+            <div>
+                <label class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                    <span class="w-2 h-2 rounded-full {% if engine_status.anthropic %}bg-green-400{% else %}bg-gray-300{% endif %}"></span>
+                    Anthropic (Claude) — Primary Writer
+                </label>
+                <input type="password" name="anthropic_key" placeholder="sk-ant-..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+            </div>
+
+            <div>
+                <label class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                    <span class="w-2 h-2 rounded-full {% if engine_status.openai %}bg-green-400{% else %}bg-gray-300{% endif %}"></span>
+                    OpenAI (GPT) — Enhancer
+                </label>
+                <input type="password" name="openai_key" placeholder="sk-..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+            </div>
+
+            <div>
+                <label class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                    <span class="w-2 h-2 rounded-full {% if engine_status.google %}bg-green-400{% else %}bg-gray-300{% endif %}"></span>
+                    Google (Gemini) — Analyst
+                    <span class="text-xs text-blue-500 font-normal">(free tier available)</span>
+                </label>
+                <input type="password" name="google_key" placeholder="AIza..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+            </div>
+
+            <div>
+                <label class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                    <span class="w-2 h-2 rounded-full {% if engine_status.perplexity %}bg-green-400{% else %}bg-gray-300{% endif %}"></span>
+                    Perplexity — Researcher
+                </label>
+                <input type="password" name="perplexity_key" placeholder="pplx-..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+            </div>
+
+            <div>
+                <label class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                    <span class="w-2 h-2 rounded-full {% if engine_status.xai %}bg-green-400{% else %}bg-gray-300{% endif %}"></span>
+                    xAI (Grok) — Researcher
+                </label>
+                <input type="password" name="xai_key" placeholder="xai-..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+            </div>
+
+            <div>
+                <label class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                    <span class="w-2 h-2 rounded-full {% if engine_status.qwen %}bg-green-400{% else %}bg-gray-300{% endif %}"></span>
+                    Qwen (Alibaba) — Writer
+                    <span class="text-xs text-blue-500 font-normal">(free tier available)</span>
+                </label>
+                <input type="password" name="qwen_key" placeholder="sk-..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+            </div>
+        </div>
+
+        <!-- Ollama (separate row — it's a model name, not a key) -->
+        <div class="border-t pt-4 mt-4">
+            <label class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                <span class="w-2 h-2 rounded-full {% if engine_status.ollama %}bg-green-400{% else %}bg-gray-300{% endif %}"></span>
+                Ollama (Local) — Free, runs on your machine
+            </label>
+            <div class="flex gap-3 items-start">
+                <input type="text" name="ollama_model" placeholder="e.g. glm4, llama3, mistral" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                <span class="text-xs text-gray-400 mt-2 whitespace-nowrap">Model name, not API key. Requires Ollama running locally.</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 pt-2">
+            <button type="submit" class="bg-brand text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-brand-light transition">Save API Keys</button>
+            <span class="text-xs text-gray-400">Keys are saved to your local .env file. Only one engine is needed to get started.</span>
+        </div>
+    </form>
+</div>
+
+<!-- LinkedIn Connection -->
+<div class="stat-card max-w-3xl mb-8">
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <h3 class="text-lg font-semibold text-gray-700">LinkedIn Connection</h3>
+            <p class="text-xs text-gray-400 mt-1">Connect your LinkedIn account to publish posts directly</p>
+        </div>
+        {% if linkedin_status.has_token %}
+        <span class="text-sm font-medium px-3 py-1 rounded-full bg-green-100 text-green-700">Connected</span>
+        {% elif linkedin_status.has_credentials %}
+        <span class="text-sm font-medium px-3 py-1 rounded-full bg-yellow-100 text-yellow-700">Credentials Set</span>
+        {% else %}
+        <span class="text-sm font-medium px-3 py-1 rounded-full bg-red-100 text-red-700">Not Connected</span>
+        {% endif %}
+    </div>
+
+    <form method="post" action="/api/linkedin/credentials" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Client ID</label>
+                <input type="text" name="client_id" placeholder="Your LinkedIn app Client ID" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Client Secret</label>
+                <input type="password" name="client_secret" placeholder="Your LinkedIn app Client Secret" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <button type="submit" class="bg-gray-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-600 transition">Save Credentials</button>
+            {% if linkedin_status.has_credentials and not linkedin_status.has_token %}
+            <a href="/auth/linkedin" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-500 transition">Connect LinkedIn</a>
+            {% endif %}
+        </div>
+    </form>
+
+    <div class="mt-4 text-xs text-gray-400 space-y-1">
+        <p class="font-medium text-gray-500">How to get LinkedIn API credentials:</p>
+        <p>1. Go to linkedin.com/developers/apps and create a new app</p>
+        <p>2. Under "Auth" tab, add <code class="bg-gray-100 px-1 rounded">http://localhost:8080/callback</code> as a redirect URL</p>
+        <p>3. Request the "Sign In with LinkedIn" and "Share on LinkedIn" products</p>
+        <p>4. Copy Client ID and Client Secret above, save, then click "Connect LinkedIn"</p>
+    </div>
+</div>
+
+<form method="post" action="/api/settings" class="max-w-3xl space-y-8">
+    <!-- LinkedIn Settings -->
+    <div class="stat-card">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">LinkedIn Schedule</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Posting Days</label>
+                <div class="space-y-2">
+                    {% for day in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] %}
+                    <label class="flex items-center gap-2">
+                        <input type="checkbox" name="posting_days" value="{{ day }}" {% if day in settings.linkedin.posting_days %}checked{% endif %} class="rounded border-gray-300 text-brand focus:ring-brand">
+                        <span class="text-sm">{{ day | title }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Posting Time</label>
+                    <input type="time" name="posting_time" value="{{ settings.linkedin.posting_time }}" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-brand focus:border-brand">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
+                    <input type="text" name="timezone" value="{{ settings.linkedin.timezone }}" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-brand focus:border-brand">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Settings -->
+    <div class="stat-card">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Content</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Min Length (chars)</label>
+                <input type="number" name="min_length" value="{{ settings.content.min_length }}" min="100" max="3000" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-brand focus:border-brand">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Max Length (chars)</label>
+                <input type="number" name="max_length" value="{{ settings.content.max_length }}" min="100" max="3000" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-brand focus:border-brand">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Hashtags Count</label>
+                <input type="number" name="hashtags_count" value="{{ settings.content.hashtags_count }}" min="0" max="10" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-brand focus:border-brand">
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Engine Pipeline Roles -->
+    <div class="stat-card">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">AI Pipeline Roles</h3>
+        <p class="text-xs text-gray-400 mb-4">How engines are used in the content generation pipeline. Configure API keys above.</p>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-gray-500 text-xs">Research</p>
+                <p class="font-medium">Perplexity, Grok</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-gray-500 text-xs">Analysis</p>
+                <p class="font-medium">Gemini</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-gray-500 text-xs">Writing</p>
+                <p class="font-medium">Claude, Qwen, Ollama</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-gray-500 text-xs">Enhancement</p>
+                <p class="font-medium">OpenAI GPT</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visual Branding -->
+    <div class="stat-card">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Visual Branding</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Primary Color</label>
+                <div class="flex items-center gap-3">
+                    <input type="color" name="color_primary" value="{{ settings.visuals.brand_colors.primary }}" class="w-10 h-10 rounded border-0 cursor-pointer">
+                    <span class="text-sm text-gray-500 font-mono">{{ settings.visuals.brand_colors.primary }}</span>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Secondary Color</label>
+                <div class="flex items-center gap-3">
+                    <input type="color" name="color_secondary" value="{{ settings.visuals.brand_colors.secondary }}" class="w-10 h-10 rounded border-0 cursor-pointer">
+                    <span class="text-sm text-gray-500 font-mono">{{ settings.visuals.brand_colors.secondary }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Learning Settings -->
+    <div class="stat-card">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Learning</h3>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-gray-500 text-xs">Tracking Intervals</p>
+                <p class="font-medium">{{ settings.learning.track_intervals_hours | join('h, ') }}h</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-gray-500 text-xs">Min Posts for Insights</p>
+                <p class="font-medium">{{ settings.learning.min_posts_for_insights }}</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-gray-500 text-xs">Optimization Frequency</p>
+                <p class="font-medium">{{ settings.learning.optimization_frequency | title }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- RSS Feeds (read-only) -->
+    <div class="stat-card">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">RSS Feeds</h3>
+        <p class="text-xs text-gray-400 mb-4">Feed configuration is managed in settings.yaml</p>
+        <div class="space-y-2">
+            {% for feed in settings.rss_feeds %}
+            <div class="flex items-center gap-3 text-sm">
+                <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                <span class="font-medium">{{ feed.name }}</span>
+                <span class="text-gray-400 text-xs truncate">{{ feed.url }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="flex gap-4">
+        <button type="submit" class="bg-brand text-white px-6 py-3 rounded-lg font-medium hover:bg-brand-light transition">Save Settings</button>
+        <a href="/settings" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition">Reset</a>
+    </div>
+</form>
+{% endblock %}

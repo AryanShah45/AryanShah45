@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}Learning Insights{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-8">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-800">Learning Insights</h2>
+        <p class="text-gray-500 mt-1">AI-driven content strategy optimization</p>
+    </div>
+    <button onclick="runOptimization()" class="bg-brand text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-light transition" id="optimize-btn">
+        Run Optimization
+    </button>
+</div>
+
+{% if insights.status == 'ready' %}
+<!-- Overview -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="stat-card">
+        <p class="text-sm text-gray-500">Posts Analyzed</p>
+        <p class="text-2xl font-bold text-gray-800 mt-1">{{ insights.posts_analyzed }}</p>
+    </div>
+    <div class="stat-card">
+        <p class="text-sm text-gray-500">Avg Score</p>
+        <p class="text-2xl font-bold text-gray-800 mt-1">{{ insights.average_score }}<span class="text-sm text-gray-400">/100</span></p>
+    </div>
+    <div class="stat-card">
+        <p class="text-sm text-gray-500">Trend</p>
+        <p class="text-2xl font-bold mt-1 {% if insights.trend == 'improving' %}text-green-600{% elif insights.trend == 'declining' %}text-red-600{% else %}text-gray-800{% endif %}">
+            {{ insights.trend | title }}
+        </p>
+    </div>
+    <div class="stat-card">
+        <p class="text-sm text-gray-500">Sweet Spot Length</p>
+        <p class="text-2xl font-bold text-gray-800 mt-1">{{ insights.optimal_length.sweet_spot if insights.optimal_length and insights.optimal_length.sweet_spot else "N/A" }}</p>
+        <p class="text-xs text-gray-400">characters</p>
+    </div>
+</div>
+
+<!-- Best Performers -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="stat-card">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Top Hooks</h3>
+        <div class="space-y-2">
+            {% for hook in insights.top_performing_hooks %}
+            <span class="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm mr-1">{{ hook | replace("_", " ") | title }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="stat-card">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Best Topics</h3>
+        <div class="space-y-2">
+            {% for topic in insights.best_topics %}
+            <span class="inline-block bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm mr-1">{{ topic | replace("_", " ") | title }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="stat-card">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Best Formats</h3>
+        <div class="space-y-2">
+            {% for vt in insights.best_visual_types %}
+            <span class="inline-block bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm mr-1">{{ vt | replace("_", " ") | title }}</span>
+            {% endfor %}
+            {% for pt in insights.best_post_types %}
+            <span class="inline-block bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm mr-1">{{ pt | replace("_", " ") | title }}</span>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Engagement Tips -->
+{% if insights.engagement_tips %}
+<div class="stat-card mb-8">
+    <h3 class="text-lg font-semibold text-gray-700 mb-4">Engagement Tips</h3>
+    <ul class="space-y-2">
+        {% for tip in insights.engagement_tips %}
+        <li class="flex items-start gap-2">
+            <svg class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span class="text-gray-700">{{ tip }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if insights.optimal_length %}
+<div class="stat-card mb-8">
+    <h3 class="text-lg font-semibold text-gray-700 mb-4">Optimal Post Length</h3>
+    <div class="flex items-center gap-4">
+        <div class="flex-1 bg-gray-200 rounded-full h-3 relative">
+            {% set min_pct = ((insights.optimal_length.min - 500) / 1500 * 100) | int %}
+            {% set max_pct = ((insights.optimal_length.max - 500) / 1500 * 100) | int %}
+            <div class="absolute h-full bg-green-400 rounded-full" style="left: {{ min_pct }}%; width: {{ max_pct - min_pct }}%"></div>
+        </div>
+        <span class="text-sm text-gray-500 whitespace-nowrap">{{ insights.optimal_length.min }} - {{ insights.optimal_length.max }} chars</span>
+    </div>
+</div>
+{% endif %}
+
+{% else %}
+<div class="stat-card text-center py-12">
+    <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+    <p class="text-gray-500 font-medium mb-2">{{ insights.message if insights.message else "Not enough data for insights" }}</p>
+    <p class="text-gray-400 text-sm">Need at least {{ insights.min_required if insights.min_required else 5 }} tracked posts. Currently have {{ insights.posts_tracked if insights.posts_tracked else 0 }}.</p>
+</div>
+{% endif %}
+
+<!-- Optimization Report (hidden by default) -->
+<div class="stat-card hidden" id="optimization-report">
+    <h3 class="text-lg font-semibold text-gray-700 mb-4">Optimization Report</h3>
+    <pre class="text-sm text-gray-700 whitespace-pre-wrap font-mono bg-gray-50 p-4 rounded-lg" id="report-text"></pre>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function runOptimization() {
+    const btn = document.getElementById('optimize-btn');
+    btn.textContent = 'Running...';
+    btn.disabled = true;
+
+    try {
+        const resp = await fetch('/api/learning/optimize', { method: 'POST' });
+        const data = await resp.json();
+
+        if (data.report) {
+            document.getElementById('report-text').textContent = data.report;
+            document.getElementById('optimization-report').classList.remove('hidden');
+        } else if (data.error) {
+            alert(data.error);
+        }
+    } catch (err) {
+        alert(err.message);
+    } finally {
+        btn.textContent = 'Run Optimization';
+        btn.disabled = false;
+    }
+}
+</script>
+{% endblock %}

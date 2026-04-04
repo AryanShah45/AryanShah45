@@ -48,6 +48,8 @@ def create_fusion_orchestrator():
         google_key=os.getenv("GOOGLE_API_KEY"),
         perplexity_key=os.getenv("PERPLEXITY_API_KEY"),
         xai_key=os.getenv("XAI_API_KEY"),
+        ollama_model=os.getenv("OLLAMA_MODEL"),
+        qwen_key=os.getenv("QWEN_API_KEY"),
     )
 
 
@@ -316,6 +318,18 @@ def setup():
 
     auth = LinkedInAuth()
     auth.setup_interactive()
+
+
+@cli.command()
+@click.option("--host", default="127.0.0.1", help="Host to bind to")
+@click.option("--port", default=8000, type=int, help="Port to bind to")
+@click.option("--reload", is_flag=True, help="Enable auto-reload for development")
+def dashboard(host, port, reload):
+    """Launch the web dashboard."""
+    import uvicorn
+
+    console.print(f"[bold]Starting web dashboard at http://{host}:{port}[/bold]")
+    uvicorn.run("src.web.app:app", host=host, port=port, reload=reload)
 
 
 if __name__ == "__main__":

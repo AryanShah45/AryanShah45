@@ -2,6 +2,7 @@
 
 import json
 import logging
+import os
 import random
 from datetime import datetime
 from pathlib import Path
@@ -16,8 +17,10 @@ from .templates import POST_STRUCTURES, HOOK_TEMPLATES, CTA_TEMPLATES
 logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-POSTS_DIR = BASE_DIR / "posts"
-DATA_DIR = BASE_DIR / "data"
+IS_VERCEL = bool(os.getenv("VERCEL"))
+WRITABLE_DIR = Path("/tmp/linkedin_automation") if IS_VERCEL else BASE_DIR
+POSTS_DIR = WRITABLE_DIR / "posts"
+DATA_DIR = WRITABLE_DIR / "data"
 
 
 class ContentGenerator:
@@ -197,8 +200,17 @@ class ContentGenerator:
         if post_type_override:
             schedule["post_type"] = post_type_override
 
+        # Handle multi-select: if comma-separated, pick one for structure but keep all in theme
         topic = schedule["topic"]
+        if "," in topic:
+            schedule["theme"] = topic.replace("_", " ").title()
+            topic = random.choice([t.strip() for t in topic.split(",")])
+            schedule["topic"] = topic
+
         post_type = schedule["post_type"]
+        if "," in post_type:
+            post_type = random.choice([t.strip() for t in post_type.split(",")])
+            schedule["post_type"] = post_type
         visual_type = schedule.get("visual", "none")
         theme = schedule.get("theme", "")
 
