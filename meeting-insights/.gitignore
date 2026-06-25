@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Local database (created by `python -m backend.seed`)
+*.db
+
+# Env
+.env
+
+# Node (only needed to rebuild vendored assets; build output IS committed)
+node_modules/
+
+# OS
+.DS_Store

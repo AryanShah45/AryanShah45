@@ -1,0 +1,115 @@
+{
+  "meeting_date": "2025-06-24",
+  "period_start": "2025-06-14",
+  "period_end": "2025-06-20",
+  "source_file": "MEETING_DT__24062025.pdf",
+  "currency": "INR",
+  "units": ["MBS", "MCORP"],
+  "collections": [
+    {
+      "agent": "ARUN",
+      "buckets": {
+        "days_90": {"mbs": 2734927, "mcorp": 149663},
+        "days_60": {"mbs": 5947632, "mcorp": 498313},
+        "days_30": {"mbs": 15224253, "mcorp": 2577513},
+        "other":   {"mbs": 16029753, "mcorp": 14197367}
+      },
+      "total_outstanding": {"mbs": 39936565, "mcorp": 17422856},
+      "collected": {"mbs": 2662268, "mcorp": 2626254},
+      "coll_per_day": 881420.33,
+      "coll_pct": 19.59,
+      "new_target": 27132301,
+      "last_week_target": 19123762
+    },
+    {
+      "agent": "GHANSHYAM",
+      "buckets": {
+        "days_90": {"mbs": 5489021, "mcorp": 839554},
+        "days_60": {"mbs": 5609527, "mcorp": 34102},
+        "days_30": {"mbs": 16215495, "mcorp": 72525},
+        "other":   {"mbs": 17096670, "mcorp": 424485}
+      },
+      "total_outstanding": {"mbs": 44410713, "mcorp": 1370666},
+      "collected": {"mbs": 5051042, "mcorp": 13369},
+      "coll_per_day": 844068.50,
+      "coll_pct": 18.62,
+      "new_target": 28260224,
+      "last_week_target": 23225964
+    },
+    {
+      "agent": "KAMLESH",
+      "buckets": {
+        "days_90": {"mbs": 4725029, "mcorp": 661073},
+        "days_60": {"mbs": 3213859, "mcorp": 2588841},
+        "days_30": {"mbs": 5372816, "mcorp": 7645985},
+        "other":   {"mbs": 12829686, "mcorp": 4646513}
+      },
+      "total_outstanding": {"mbs": 26141390, "mcorp": 15542412},
+      "collected": {"mbs": 1512998, "mcorp": 1727035},
+      "coll_per_day": 540005.50,
+      "coll_pct": 14.15,
+      "new_target": 24207603,
+      "last_week_target": 20900000
+    },
+    {
+      "agent": "ANKLESHWAR",
+      "buckets": {
+        "days_90": {"mbs": 7662440, "mcorp": 1265645},
+        "days_60": {"mbs": 4126191, "mcorp": 19569},
+        "days_30": {"mbs": 10823707, "mcorp": 0},
+        "other":   {"mbs": 7750632, "mcorp": 974}
+      },
+      "total_outstanding": {"mbs": 30362970, "mcorp": 1286188},
+      "collected": {"mbs": 2633449, "mcorp": 0},
+      "coll_per_day": 438908.17,
+      "coll_pct": 11.06,
+      "new_target": 23897552,
+      "last_week_target": 24693486
+    },
+    {
+      "agent": "UMESHBHAI",
+      "buckets": {
+        "days_90": {"mbs": 1403862, "mcorp": 275279},
+        "days_60": {"mbs": 1000478, "mcorp": 209051},
+        "days_30": {"mbs": 4661779, "mcorp": 1119480},
+        "other":   {"mbs": 15486543, "mcorp": 2787991}
+      },
+      "total_outstanding": {"mbs": 22552662, "mcorp": 4391801},
+      "collected": {"mbs": 2266066, "mcorp": 208463},
+      "coll_per_day": 412421.50,
+      "coll_pct": 34.85,
+      "new_target": 8669929,
+      "last_week_target": 4618939
+    }
+  ],
+  "sales": [
+    {"salesperson": "SACHIN", "branch": "ANKLESHWAR", "purchase": {"mbs": 14.75, "mcorp": 0}, "sales": {"mbs": 55.03, "mcorp": 0}},
+    {"salesperson": "SACHIN", "branch": "UDHNA", "purchase": {"mbs": 12.97, "mcorp": 2.99}, "sales": {"mbs": 29.03, "mcorp": 0.78}},
+    {"salesperson": "SACHIN", "branch": "KADODRA", "purchase": {"mbs": 35.68, "mcorp": 14.87}, "sales": {"mbs": 24.93, "mcorp": 2.78}},
+    {"salesperson": "GHANSHYAM", "branch": "ANKLESHWAR", "purchase": {"mbs": 11.65, "mcorp": 0}, "sales": {"mbs": 0, "mcorp": 0}},
+    {"salesperson": "GHANSHYAM", "branch": "SACHIN", "purchase": {"mbs": 14.811, "mcorp": 0.6}, "sales": {"mbs": 0, "mcorp": 0}},
+    {"salesperson": "GHANSHYAM", "branch": "UDHNA", "purchase": {"mbs": 16.33, "mcorp": 0}, "sales": {"mbs": 0, "mcorp": 0}},
+    {"salesperson": "GHANSHYAM", "branch": "KADODRA", "purchase": {"mbs": 17.43, "mcorp": 1.48}, "sales": {"mbs": 0, "mcorp": 0}},
+    {"salesperson": "HITESH", "branch": "ALL", "purchase": {"mbs": 0, "mcorp": 0}, "sales": {"mbs": 0, "mcorp": 0}},
+    {"salesperson": "MEETBHAI", "branch": "ALL", "purchase": {"mbs": 0, "mcorp": 0}, "sales": {"mbs": 0, "mcorp": 0}}
+  ],
+  "sales_reps": [
+    {"salesperson": "SACHIN", "target_tons": 50, "achieve_pct_tons": 125, "target_party": 10, "achieve_pct_party": 50, "total_visit": 0, "total_inquiry": 0, "inquiry_confirm": 0, "order_loss": 0},
+    {"salesperson": "GHANSHYAM", "target_tons": 50, "achieve_pct_tons": 125, "target_party": 10, "achieve_pct_party": 50, "total_visit": 5, "total_inquiry": 0, "inquiry_confirm": 3, "order_loss": 0},
+    {"salesperson": "HITESH", "target_tons": 50, "achieve_pct_tons": 0, "target_party": 10, "achieve_pct_party": 0, "total_visit": 0, "total_inquiry": 0, "inquiry_confirm": 0, "order_loss": 0},
+    {"salesperson": "MEETBHAI", "target_tons": 0, "achieve_pct_tons": 0, "target_party": 0, "achieve_pct_party": 0, "total_visit": 35, "total_inquiry": 4, "inquiry_confirm": 0, "order_loss": 0}
+  ],
+  "quotations": [
+    {"stage": "PREPARED", "mbs": 95, "mcorp": 38, "total": 133, "per_day": 22.17},
+    {"stage": "CONFIRMED", "mbs": 59, "mcorp": 20, "total": 79, "per_day": 13.17},
+    {"stage": "PENDING", "mbs": 32, "mcorp": 14, "total": 46, "per_day": 7.67},
+    {"stage": "UNDER_PROCESS", "mbs": 32, "mcorp": 14, "total": 46, "per_day": 7.67},
+    {"stage": "NOT_CONFIRMED", "mbs": 4, "mcorp": 4, "total": 8, "per_day": 1.33}
+  ],
+  "totals": {
+    "total_outstanding": {"mbs": 163404300, "mcorp": 40013923, "total": 203418223, "per_day": 25019924.00},
+    "total_collection": {"mbs": 14125823, "mcorp": 4575121, "total": 18700944, "per_day": 3116824.00},
+    "total_sales": {"mbs": 14659825, "mcorp": 5695227, "total": 20355052, "per_day": 3392508.67},
+    "total_purchase": {"mbs": 3278895, "mcorp": 4046736, "total": 7325631, "per_day": 1220938.50}
+  }
+}

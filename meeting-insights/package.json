@@ -1,0 +1,18 @@
+{
+  "name": "meeting-insights",
+  "version": "1.0.0",
+  "description": "Weekly collections & sales meeting insights platform",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -c tailwind.config.js -i frontend/src.css -o frontend/vendor/app.css --minify",
+    "build:js": "cp node_modules/chart.js/dist/chart.umd.js frontend/vendor/chart.umd.js",
+    "build": "npm run build:css && npm run build:js"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "tailwindcss": "^3.4.1"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.1"
+  }
+}

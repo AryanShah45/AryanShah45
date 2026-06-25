@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meeting Insights — Collections & Sales</title>
+  <!-- Self-contained: no external CDNs. Tailwind is pre-compiled; Chart.js is vendored. -->
+  <link rel="stylesheet" href="/static/vendor/app.css" />
+  <script src="/static/vendor/chart.umd.js"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased">
+
+  <!-- LOGIN -->
+  <div id="login-view" class="min-h-screen flex items-center justify-center px-4">
+    <div class="w-full max-w-sm bg-white rounded-2xl shadow-xl p-8">
+      <div class="text-center mb-6">
+        <div class="mx-auto w-12 h-12 rounded-xl bg-brand-600 text-white grid place-content-center text-xl font-bold">MI</div>
+        <h1 class="mt-3 text-xl font-semibold text-slate-900">Meeting Insights</h1>
+        <p class="text-sm text-slate-500">Weekly Collections & Sales</p>
+      </div>
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-600 mb-1">Username</label>
+          <input id="login-username" class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-brand-500 outline-none" autocomplete="username" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-600 mb-1">Password</label>
+          <input id="login-password" type="password" class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-brand-500 outline-none" autocomplete="current-password" />
+        </div>
+        <p id="login-error" class="text-sm text-red-600 hidden"></p>
+        <button class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-lg py-2 transition">Sign in</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app-view" class="hidden min-h-screen">
+    <!-- Sidebar -->
+    <div class="flex">
+      <aside class="w-60 bg-brand-900 text-white min-h-screen p-4 hidden md:flex flex-col fixed">
+        <div class="flex items-center gap-2 mb-8">
+          <div class="w-9 h-9 rounded-lg bg-white text-brand-700 grid place-content-center font-bold">MI</div>
+          <span class="font-semibold">Meeting Insights</span>
+        </div>
+        <nav class="space-y-1 flex-1" id="nav">
+          <button data-nav="dashboard" class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">📊 Dashboard</button>
+          <button data-nav="trends" class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">📈 Trends</button>
+          <button data-nav="entry" class="nav-btn editor-only w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">📝 Data Entry</button>
+          <button data-nav="users" class="nav-btn admin-only w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">👥 Users</button>
+        </nav>
+        <div class="mt-auto text-sm text-white/70 border-t border-white/10 pt-3">
+          <div id="who" class="mb-2"></div>
+          <button id="logout" class="text-white/90 hover:text-white underline">Sign out</button>
+        </div>
+      </aside>
+
+      <main class="flex-1 md:ml-60 p-6 max-w-[1400px]">
+        <!-- mobile topbar -->
+        <div class="md:hidden flex items-center justify-between mb-4">
+          <span class="font-semibold text-brand-900">Meeting Insights</span>
+          <select id="mobile-nav" class="border rounded-lg px-2 py-1 text-sm">
+            <option value="dashboard">Dashboard</option>
+            <option value="trends">Trends</option>
+            <option value="entry">Data Entry</option>
+            <option value="users">Users</option>
+          </select>
+        </div>
+
+        <div id="page"></div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
